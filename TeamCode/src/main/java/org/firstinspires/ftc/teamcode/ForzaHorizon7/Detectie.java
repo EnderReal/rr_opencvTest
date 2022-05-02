@@ -6,11 +6,9 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
-import org.opencv.core.Mat;
 import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
-import org.openftc.easyopencv.OpenCvInternalCamera;
 
 @Autonomous
 public class Detectie extends LinearOpMode {
@@ -38,7 +36,7 @@ public class Detectie extends LinearOpMode {
         camera.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
             @Override
             public void onOpened() {
-                camera.startStreaming(320, 240, OpenCvCameraRotation.UPRIGHT);
+                camera.startStreaming(CAMERA_WIDTH, CAMERA_HEIGHT, OpenCvCameraRotation.UPRIGHT);
             }
 
             @Override
@@ -52,10 +50,19 @@ public class Detectie extends LinearOpMode {
         FtcDashboard dashboard = FtcDashboard.getInstance();
         telemetry = new MultipleTelemetry(telemetry, dashboard.getTelemetry());
         FtcDashboard.getInstance().startCameraStream(camera, 0);
-        double value = pipeline.getValue()/255;
-        String aia = String.valueOf(value);
-        telemetry.addData("pula", aia);
-        telemetry.update();
+
+        int pozitie = pipeline.gasesteMarker();
+        switch (pozitie){
+            case 1:
+                telemetry.addData("este:","stanga");
+            case 2:
+                telemetry.addData("este:","centru");
+            case 3:
+                telemetry.addData("este:", "dreapta");
+            case 0:
+                telemetry.addData("mama ce"," picior in gura merita");
+        }
+
     }
 
     }
