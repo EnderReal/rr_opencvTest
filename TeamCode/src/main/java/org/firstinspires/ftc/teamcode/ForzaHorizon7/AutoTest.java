@@ -28,11 +28,18 @@ public class AutoTest extends LinearOpMode {
 
         TrajectorySequence drum = drive.trajectorySequenceBuilder( pose )
                 .lineTo( Variabile.hub_vector )
-                .addDisplacementMarker(20, () -> {
-                    drive.
+                .addDisplacementMarker(() -> {
+                    drive.scula_rise(5);
                 })
-                .waitSeconds(4)
+                .waitSeconds(2)
+                .addDisplacementMarker( () -> {
+                    drive.arunca();
+                })
                 .lineToLinearHeading( Variabile.start_spreHouse)
+                .addDisplacementMarker( () -> {
+                    drive.retrage_cuva();
+                    drive.scula_rise(-5);
+                })
                 .resetConstraints()
                 .build();
 

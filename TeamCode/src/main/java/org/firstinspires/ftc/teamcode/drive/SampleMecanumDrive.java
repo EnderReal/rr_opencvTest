@@ -19,11 +19,13 @@ import com.acmerobotics.roadrunner.trajectory.constraints.TrajectoryAcceleration
 import com.acmerobotics.roadrunner.trajectory.constraints.TrajectoryVelocityConstraint;
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.lynx.LynxModule;
+import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
+import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
 import com.qualcomm.robotcore.hardware.configuration.typecontainers.MotorConfigurationType;
 
@@ -78,6 +80,20 @@ public class SampleMecanumDrive extends MecanumDrive {
     private BNO055IMU imu;
     private VoltageSensor batteryVoltageSensor;
 
+    CRServo roata,mana,absorbtie;
+    Servo cuva;
+    DcMotor bascula,scula_m;
+
+    private double HEX_TICKS = 288;
+    private double CUVA_DIAMETER = 1;
+    private double COUNTS_PER_INCH = HEX_TICKS / CUVA_DIAMETER;
+
+    public static double default_cuva = .35; //.25
+    public static double drop_cuva = .6;
+    public static double absorbtie_power = 1;
+    public static double roata_power = -1;
+    public static double scula_power = .6;
+
     public SampleMecanumDrive(HardwareMap hardwareMap) {
         super(kV, kA, kStatic, TRACK_WIDTH, TRACK_WIDTH, LATERAL_MULTIPLIER);
 
@@ -126,6 +142,18 @@ public class SampleMecanumDrive extends MecanumDrive {
         rightRear = hardwareMap.get(DcMotorEx.class, "rr");
         rightFront = hardwareMap.get(DcMotorEx.class, "rf");
 
+        absorbtie = hardwareMap.get(CRServo.class, "absortie");
+        roata = hardwareMap.get(CRServo.class, "rata");
+        mana = hardwareMap.get(CRServo.class, "gheara");
+        cuva = hardwareMap.get(Servo.class, "cuva");
+        scula_m = hardwareMap.get(DcMotor.class, "brat_marker");
+        bascula = hardwareMap.get(DcMotor.class, "brat");
+
+        scula_m.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        bascula.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
+        bascula.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
         motors = Arrays.asList(leftFront, leftRear, rightRear, rightFront);
 
         for (DcMotorEx motor : motors) {
@@ -155,6 +183,28 @@ public class SampleMecanumDrive extends MecanumDrive {
 
         trajectorySequenceRunner = new TrajectorySequenceRunner(follower, HEADING_PID);
     }
+
+    public void scula_rise(double distance){
+        double ticks = distance * COUNTS_PER_INCH;
+        bascula.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        bascula.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        bascula.setTargetPosition( bascula.getCurrentPosition() + (int)ticks );
+        bascula.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        bascula.setPower(scula_power);
+        while(bascula.isBusy()){}
+        bascula.setPower(0);
+        bascula.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+    }
+
+    public void arunca(){ cuva.setPosition(drop_cuva); }
+    public void retrage_cuva(){ cuva.setPosition(default_cuva); }
+
+    public void betie_rata(){ roata.setPower(roata_power); }
+    public void stop_rata(){ roata.setPower(0); }
+
+    public void absoarbe(){ absorbtie.setPower(absorbtie_power); }
+    public void stai_absorbtie(){ absorbtie.setPower(0); }
+    public void scuipa(){ absorbtie.setPower(-1); }
 
     public void rotate(double power, double direction){
 
