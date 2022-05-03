@@ -36,7 +36,7 @@ public class Detectie extends LinearOpMode {
         camera.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
             @Override
             public void onOpened() {
-                camera.startStreaming(CAMERA_WIDTH, CAMERA_HEIGHT, OpenCvCameraRotation.UPRIGHT);
+                camera.startStreaming(320, 240, OpenCvCameraRotation.UPRIGHT);
             }
 
             @Override
@@ -47,21 +47,17 @@ public class Detectie extends LinearOpMode {
         waitForStart();
 
         while(opModeIsActive()){
+
         FtcDashboard dashboard = FtcDashboard.getInstance();
         telemetry = new MultipleTelemetry(telemetry, dashboard.getTelemetry());
         FtcDashboard.getInstance().startCameraStream(camera, 0);
 
         int pozitie = pipeline.gasesteMarker();
-        switch (pozitie){
-            case 1:
-                telemetry.addData("este:","stanga");
-            case 2:
-                telemetry.addData("este:","centru");
-            case 3:
-                telemetry.addData("este:", "dreapta");
-            case 0:
-                telemetry.addData("mama ce"," picior in gura merita");
-        }
+        String pos = Integer.toString(pozitie);
+        telemetry.addData("Locatie:", pos);
+
+        telemetry.addData("Sa imi bag", "daca merge beau");
+        telemetry.update();
 
     }
 
