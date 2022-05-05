@@ -94,6 +94,7 @@ public class SampleMecanumDrive extends MecanumDrive {
     public static double roata_power = -1;
     public static double scula_power = .6;
 
+
     public SampleMecanumDrive(HardwareMap hardwareMap) {
         super(kV, kA, kStatic, TRACK_WIDTH, TRACK_WIDTH, LATERAL_MULTIPLIER);
 
@@ -184,10 +185,11 @@ public class SampleMecanumDrive extends MecanumDrive {
         trajectorySequenceRunner = new TrajectorySequenceRunner(follower, HEADING_PID);
     }
 
+    public void scula_power(double power){ bascula.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER); bascula.setPower(power); }
+
     public void scula_rise(double distance){
         double ticks = distance * COUNTS_PER_INCH;
         bascula.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        bascula.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         bascula.setTargetPosition( bascula.getCurrentPosition() + (int)ticks );
         bascula.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         bascula.setPower(scula_power);

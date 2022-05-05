@@ -6,7 +6,11 @@ import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 @Config
-public class Variabile {
+public class variabile {
+
+    public static double timp_ridicare_sus = 2;
+    public static double timp_ridicare_centru = 1;
+    public static double timp_ridicare_jos = .5;
 
     public static Pose2d hub = new Pose2d( 0, 27, Math.toRadians(0));
     public static Vector2d hub_vector = new Vector2d( 5, 27);

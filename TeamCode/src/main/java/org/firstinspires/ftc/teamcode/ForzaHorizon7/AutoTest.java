@@ -1,8 +1,6 @@
 package org.firstinspires.ftc.teamcode.ForzaHorizon7;
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
-import com.acmerobotics.roadrunner.geometry.Vector2d;
-import com.acmerobotics.roadrunner.trajectory.Trajectory;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
@@ -27,20 +25,26 @@ public class AutoTest extends LinearOpMode {
         drive.setPoseEstimate(pose);
 
         TrajectorySequence drum = drive.trajectorySequenceBuilder( pose )
-                .lineTo( Variabile.hub_vector )
-                .addDisplacementMarker(() -> {
-                    drive.scula_rise(5);
+                .lineTo( variabile.hub_vector )
+                .addTemporalMarker(0, () ->{
+                    drive.scula_power(drive.scula_power);
                 })
-                .waitSeconds(2)
-                .addDisplacementMarker( () -> {
+                .addTemporalMarker( 0 + variabile.timp_ridicare_sus, ()->{
+                    drive.scula_power(0);
+                })
+                .addTemporalMarker( 3, ()->{
+                    drive.scula_power(0);
                     drive.arunca();
                 })
-                .lineToLinearHeading( Variabile.start_spreHouse)
-                .addDisplacementMarker( () -> {
+                .waitSeconds(2)
+                .lineToLinearHeading( variabile.start_spreHouse)
+                .addTemporalMarker( 5, ()->{
                     drive.retrage_cuva();
-                    drive.scula_rise(-5);
+                    drive.scula_power(-1);
                 })
-                .resetConstraints()
+                .addTemporalMarker(5 + variabile.timp_ridicare_sus, ()->{
+                    drive.scula_power(0);
+                })
                 .build();
 
         waitForStart();
