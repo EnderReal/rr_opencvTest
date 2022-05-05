@@ -29,6 +29,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
 import com.qualcomm.robotcore.hardware.configuration.typecontainers.MotorConfigurationType;
 
+import org.firstinspires.ftc.teamcode.ForzaHorizon7.variabile;
 import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
 import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequenceBuilder;
 import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequenceRunner;
@@ -189,17 +190,20 @@ public class SampleMecanumDrive extends MecanumDrive {
 
     public void scula_rise(double distance){
         double ticks = distance * COUNTS_PER_INCH;
+        bascula.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         bascula.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         bascula.setTargetPosition( bascula.getCurrentPosition() + (int)ticks );
         bascula.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         bascula.setPower(scula_power);
-        while(bascula.isBusy()){}
+    }
+    public void scula_stop(){
+        scula_rise(0);
         bascula.setPower(0);
-        bascula.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        bascula.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
     }
 
-    public void arunca(){ cuva.setPosition(drop_cuva); }
-    public void retrage_cuva(){ cuva.setPosition(default_cuva); }
+    public void arunca(){ cuva.setPosition(variabile.drop_cuva); }
+    public void retrage_cuva(){ cuva.setPosition(variabile.default_cuva); }
 
     public void betie_rata(){ roata.setPower(roata_power); }
     public void stop_rata(){ roata.setPower(0); }

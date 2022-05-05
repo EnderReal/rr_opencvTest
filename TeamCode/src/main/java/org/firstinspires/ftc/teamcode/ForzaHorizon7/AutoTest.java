@@ -1,11 +1,16 @@
 package org.firstinspires.ftc.teamcode.ForzaHorizon7;
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
+import com.acmerobotics.roadrunner.trajectory.constraints.TrajectoryVelocityConstraint;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
+import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
+import org.openftc.easyopencv.OpenCvCamera;
+import org.openftc.easyopencv.OpenCvCameraFactory;
+import org.openftc.easyopencv.OpenCvCameraRotation;
 
 @Autonomous
 public class AutoTest extends LinearOpMode {
@@ -24,32 +29,59 @@ public class AutoTest extends LinearOpMode {
 
         drive.setPoseEstimate(pose);
 
-        TrajectorySequence drum = drive.trajectorySequenceBuilder( pose )
+        OpenCvCamera camera; // = OpenCvCameraFactory.getInstance().createInternalCamera(OpenCvInternalCamera.CameraDirection.BACK, cameraMonitorViewId);
+
+        int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
+        camera = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Webcam 1"), cameraMonitorViewId);
+
+        NordStream2PipeLine pipeline = new NordStream2PipeLine();
+        camera.setPipeline(pipeline);
+
+        camera.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
+            @Override
+            public void onOpened() {
+                camera.startStreaming(320, 240, OpenCvCameraRotation.UPRIGHT);
+            }
+
+            @Override
+            public void onError(int errorCode) {
+            }
+        });
+
+        int pozitie = pipeline.gasesteMarker();
+        double timp_ridicare;
+        if(pozitie == 1)
+            timp_ridicare = variabile.timp_ridicare_jos;
+        else if(pozitie == 2)
+            timp_ridicare = variabile.timp_ridicare_centru;
+        else timp_ridicare = variabile.timp_ridicare_sus;
+
+        TrajectorySequence start2hub = drive.trajectorySequenceBuilder( pose )
+                .addDisplacementMarker( () ->{
+                    drive.scula_power(1);
+                })
                 .lineTo( variabile.hub_vector )
-                .addTemporalMarker(0, () ->{
-                    drive.scula_power(drive.scula_power);
-                })
-                .addTemporalMarker( 0 + variabile.timp_ridicare_sus, ()->{
-                    drive.scula_power(0);
-                })
-                .addTemporalMarker( 3, ()->{
+                .addTemporalMarker( timp_ridicare-1, ()->{
                     drive.scula_power(0);
                     drive.arunca();
                 })
-                .waitSeconds(2)
-                .lineToLinearHeading( variabile.start_spreHouse)
-                .addTemporalMarker( 5, ()->{
+                .addTemporalMarker( 1+timp_ridicare, ()->{
                     drive.retrage_cuva();
                     drive.scula_power(-1);
                 })
-                .addTemporalMarker(5 + variabile.timp_ridicare_sus, ()->{
+                .addTemporalMarker(4.2 + variabile.timp_coborare_sus, ()->{
                     drive.scula_power(0);
                 })
+                .lineToLinearHeading( variabile.start_spreHouse)
+                .addDisplacementMarker( ()->{
+                    drive.absoarbe();
+                })
+                .lineTo(variabile.depozit)
                 .build();
 
         waitForStart();
 
-        drive.followTrajectorySequence(drum);
+        drive.followTrajectorySequence(start2hub);
 
     }
 
