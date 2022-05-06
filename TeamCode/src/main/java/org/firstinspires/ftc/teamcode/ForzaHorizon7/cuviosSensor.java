@@ -19,7 +19,7 @@ public class cuviosSensor extends LinearOpMode {
         distanceSensor = hardwareMap.get(DistanceSensor.class, "sensor_range");
         while (opModeIsActive()) {
             double distance = distanceSensor.getDistance(DistanceUnit.CM);
-            telemetry.addData("aici", String.valueOf(distance));
+            telemetry.addData("diff:", String.valueOf(distance));
             telemetry.update();
         }
     }
