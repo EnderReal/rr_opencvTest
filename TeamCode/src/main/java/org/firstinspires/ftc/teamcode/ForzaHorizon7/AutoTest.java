@@ -1,9 +1,11 @@
 package org.firstinspires.ftc.teamcode.ForzaHorizon7;
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
+import com.acmerobotics.roadrunner.trajectory.Trajectory;
 import com.acmerobotics.roadrunner.trajectory.constraints.TrajectoryVelocityConstraint;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
@@ -16,6 +18,8 @@ import org.openftc.easyopencv.OpenCvCameraRotation;
 public class AutoTest extends LinearOpMode {
 
     SampleMecanumDrive drive;
+
+    private ElapsedTime time = new ElapsedTime();
 
     public static double FRONTAL_MULTIPLIER = 0.951254565; // DIPSHIT
     public static double LATERAL_MULTIPLIER = 1;
@@ -48,6 +52,8 @@ public class AutoTest extends LinearOpMode {
             }
         });
 
+        waitForStart();
+
         int pozitie = pipeline.gasesteMarker();
         double timp_ridicare;
         if(pozitie == 1)
@@ -65,11 +71,11 @@ public class AutoTest extends LinearOpMode {
                     drive.scula_power(0);
                     drive.arunca();
                 })
-                .addTemporalMarker( 1+timp_ridicare, ()->{
+                .addTemporalMarker( timp_ridicare, ()->{
                     drive.retrage_cuva();
                     drive.scula_power(-1);
                 })
-                .addTemporalMarker(4.2 + variabile.timp_coborare_sus, ()->{
+                .addTemporalMarker( timp_ridicare + variabile.timp_coborare_sus, ()->{
                     drive.scula_power(0);
                 })
                 .lineToLinearHeading( variabile.start_spreHouse)
@@ -79,10 +85,28 @@ public class AutoTest extends LinearOpMode {
                 .lineTo(variabile.depozit)
                 .build();
 
-        waitForStart();
-
         drive.followTrajectorySequence(start2hub);
 
+        time.reset();
+        double distanta = drive.sensor_distanta();
+
+        while(time.seconds() <= 2 && distanta>=9){
+            drive.putere(-.2, -.2, -.2, -.2);
+        }
+
+            TrajectorySequence depozit2start = drive.trajectorySequenceBuilder( drive.getPoseEstimate() )
+                    .addDisplacementMarker( ()->{
+                        drive.scuipa();
+                    })
+                    .lineTo(variabile.depozit)
+                    .splineTo(variabile.depozit_iesire, Math.toRadians(90))
+                    .addTemporalMarker( 1.7, ()->{
+                        drive.stai_absorbtie();
+                    })
+                    .build();
+
+        drive.followTrajectorySequence(depozit2start);
+//        drive.followTrajectorySequence(start2hub);
     }
 
     //functie care returneaza distanta corecta cu tot cu multiplier ca face undershoot

@@ -23,12 +23,14 @@ import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
 import com.qualcomm.robotcore.hardware.configuration.typecontainers.MotorConfigurationType;
 
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.ForzaHorizon7.variabile;
 import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
 import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequenceBuilder;
@@ -80,6 +82,7 @@ public class SampleMecanumDrive extends MecanumDrive {
 
     private BNO055IMU imu;
     private VoltageSensor batteryVoltageSensor;
+    private DistanceSensor distanceSensor;
 
     CRServo roata,mana,absorbtie;
     Servo cuva;
@@ -151,6 +154,8 @@ public class SampleMecanumDrive extends MecanumDrive {
         scula_m = hardwareMap.get(DcMotor.class, "brat_marker");
         bascula = hardwareMap.get(DcMotor.class, "brat");
 
+        distanceSensor = hardwareMap.get(DistanceSensor.class, "sensor_range");
+
         scula_m.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         bascula.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
@@ -184,6 +189,10 @@ public class SampleMecanumDrive extends MecanumDrive {
         setLocalizer(new TwoWheelTrackingLocalizer(hardwareMap, this));
 
         trajectorySequenceRunner = new TrajectorySequenceRunner(follower, HEADING_PID);
+    }
+
+    public double sensor_distanta(){
+        return distanceSensor.getDistance(DistanceUnit.CM);
     }
 
     public void scula_power(double power){ bascula.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER); bascula.setPower(power); }
